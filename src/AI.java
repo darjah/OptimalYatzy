@@ -10,7 +10,8 @@ public class AI {
 		int turn = 15 - emptyCategories.size() + 1;
 
 		//turn <= earlyGame
-		if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
+		//emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)
+		if(!card.doWeHaveBonus()){
 			if(card.possibleToGetBonus()){
 				EarlyStrategy.play(card, hand);
 			}
@@ -55,7 +56,7 @@ public class AI {
 		int[] diceFreq = new int [diceMaxValue];
 		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
 
-		//Hitta paren genom att kolla frekvenslistan, par om >=2
+		//Hitta paren genom att kolla frekvenslistan, par om diceFreq[i]>=2
 		for(int i = 0; i < diceMaxValue; i++){
 			if(diceFreq[i] >= 2){
 				scores[i] = (i+1)*2;
@@ -201,7 +202,7 @@ public class AI {
 		return 0;
 	}
 
-	public static boolean catchHand(Hand hand, Scorecard card){
+	public static boolean catchHand(Scorecard card, Hand hand){
 		LinkedList<Integer> freeScores = card.getEmptyCategories();
 
 		//Kolla om vi har stege eller yatzy

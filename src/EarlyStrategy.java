@@ -6,7 +6,12 @@ public class EarlyStrategy {
 		int[] evalScores = new int[card.categories.length];
 		int[] diceFrequency = new int[AI.diceMaxValue];
 		diceFrequency = hand.diceFrequency(hand.getHandArray(), diceFrequency);
-
+		
+		//Kolla om vi har stege eller yatzy
+		if(AI.catchHand(card, hand)){
+			return;
+		}
+		
 		//Första iterationen av att kolla vad som ska behållas och kasta om tärningarna där efter
 		int valueToKeep = valueToKeep(card, hand, diceFrequency);
 		GetCategories.allOfAKind(hand, valueToKeep);
@@ -108,7 +113,7 @@ public class EarlyStrategy {
 		}
 		
 		//Kollar efter yatzy, liten och storstege
-		else if(AI.catchHand(hand, card)){
+		else if(AI.catchHand(card, hand)){
 			return true;
 		}
 		

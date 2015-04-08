@@ -3,7 +3,7 @@ import java.util.LinkedList;
 public class MidStrategy {
 	public static void play(Scorecard card, Hand hand){
 		//Fånga liten/stor stege eller yatzy direkt
-		boolean checked = AI.catchHand(hand, card);
+		boolean checked = AI.catchHand(card, hand);
 		if(checked){
 			return;
 		}
@@ -23,7 +23,7 @@ public class MidStrategy {
 	public static void onPar(Scorecard card, Hand hand){
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
 
-		if(AI.catchHand(hand, card)){
+		if(AI.catchHand(card, hand)){
 			return;
 		}
 
@@ -34,7 +34,7 @@ public class MidStrategy {
 		int betOn = uppCheck(card, hand);
 
 		GetCategories.allOfAKind(hand, betOn);
-		if(AI.catchHand(hand, card)){
+		if(AI.catchHand(card, hand)){
 			return;
 		}
 		if(AI.fullHouse(card, hand)){
@@ -76,7 +76,7 @@ public class MidStrategy {
 		int keep = betOnInt(card, hand);
 
 		GetCategories.allOfAKind(hand, keep);
-		if(AI.catchHand(hand, card)){
+		if(AI.catchHand(card, hand)){
 			return;
 		}
 
@@ -206,7 +206,7 @@ public class MidStrategy {
 	public static void allOfAKindDefensive(Scorecard card, Hand hand, int kept){
 		LinkedList<Integer> freeCategories = card.getEmptyCategories();
 
-		boolean checked = AI.catchHand(hand, card);
+		boolean checked = AI.catchHand(card, hand);
 		if(checked){
 			return;
 		}
@@ -255,7 +255,7 @@ public class MidStrategy {
 	public static void allOfAKindAgressive(Scorecard card, Hand hand, int kept){
 		LinkedList<Integer> freeCategories = card.getEmptyCategories();
 
-		boolean checked = AI.catchHand(hand, card);
+		boolean checked = AI.catchHand(card, hand);
 		if(checked){
 			return;
 		}
@@ -305,7 +305,7 @@ public class MidStrategy {
 		int[] diceFreq = new int [AI.diceMaxValue];
 		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
 
-		boolean hadeRedan = AI.catchHand(hand, card);
+		boolean hadeRedan = AI.catchHand(card, hand);
 		if(hadeRedan){
 			return;
 		}
@@ -314,13 +314,13 @@ public class MidStrategy {
 		if(freeCategories.contains(Scorecard.smallStraight)){
 			if(straights[0] || straights[1]){
 				GetCategories.smallStraight(hand);
-				boolean caught = AI.catchHand(hand, card);
+				boolean caught = AI.catchHand(card, hand);
 				if(caught){
 					return;
 				}
 
 				GetCategories.smallStraight(hand);
-				caught = AI.catchHand(hand, card);
+				caught = AI.catchHand(card, hand);
 				if(caught){
 					return;
 				}
@@ -330,13 +330,13 @@ public class MidStrategy {
 		if(freeCategories.contains(Scorecard.largeStraight) && hand.getRoll() == 1){
 			if(straights[1] || straights[2]){
 				GetCategories.largeStraight(hand);
-				boolean caught = AI.catchHand(hand, card);
+				boolean caught = AI.catchHand(card, hand);
 				if(caught){
 					return;
 				}
 
 				GetCategories.largeStraight(hand);
-				caught = AI.catchHand(hand, card);
+				caught = AI.catchHand(card, hand);
 				if(caught){
 					return;
 				}

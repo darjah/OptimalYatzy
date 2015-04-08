@@ -45,7 +45,32 @@ public class Scorecard {
 	public int onPar(){
 		int parScore = 0;
 
-		for(int i = 0; i < sixes; i++){
+		for(int i = 0; i <= sixes; i++){
+			if(categories[i] >= 0){
+				parScore += categories[i];
+			} 
+			else{
+				parScore += i * 3;
+			}
+		}
+		
+		//Om över onPar, ret 1
+		if(parScore > pointsToBonus){
+			return 1;
+		}
+		//Om onPar, ret 0
+		if(parScore == pointsToBonus){
+			return 0;
+		}
+		//Om under onPar, ret -1
+		return -1;
+	}
+	
+	//TODO kollar om man fortfarande ligger onPar om man lägger i värdet i scorecarden
+	public int stillOnPar(int value, int[] diceFreq){
+		int parScore = 0;
+
+		for(int i = 0; i <= sixes; i++){
 			if(categories[i] >= 0){
 				parScore += categories[i];
 			} 
@@ -108,10 +133,5 @@ public class Scorecard {
 			total += bonus;
 		}
 		return total;
-	}
-
-	//For testing
-	public void setScorecard(int[] array){
-		categories = array;
 	}
 }

@@ -27,7 +27,7 @@ public class EndStrategy {
 			//System.out.println("222");
 			GetCategories.smallStraight(hand);
 			GetCategories.smallStraight(hand);
-			if (AI.catchHand(hand, card)) {
+			if (AI.catchHand(card, hand)) {
 				return;
 			}
 			wentForStraight = true;
@@ -36,7 +36,7 @@ public class EndStrategy {
 			//System.out.println("333");
 			GetCategories.largeStraight(hand);
 			GetCategories.largeStraight(hand);
-			if (AI.catchHand(hand, card)) {
+			if (AI.catchHand(card, hand)) {
 				return;
 			}
 			wentForStraight = true;
@@ -63,7 +63,7 @@ public class EndStrategy {
 			//System.out.println("5555");
 			GetCategories.smallStraight(hand);
 			GetCategories.smallStraight(hand);
-			if (AI.catchHand(hand, card)) {
+			if (AI.catchHand(card, hand)) {
 				return;
 			}
 			NullEntry.zeroDown(card);
@@ -77,7 +77,7 @@ public class EndStrategy {
 			//System.out.println("6666");
 			GetCategories.largeStraight(hand);
 			GetCategories.largeStraight(hand);
-			if (AI.catchHand(hand, card)) {
+			if (AI.catchHand(card, hand)) {
 				return;
 			}
 			NullEntry.zeroDown(card);
@@ -89,18 +89,18 @@ public class EndStrategy {
 				&& card.categories[Scorecard.largeStraight] == -1 && card.categories[Scorecard.chance] == -1))) {
 			//System.out.println("7777");
 			GetCategories.largeStraight(hand);
-			if (AI.catchHand(hand, card)) {
+			if (AI.catchHand(card, hand)) {
 				return;
 			}
 			GetCategories.largeStraight(hand);
-			if (AI.catchHand(hand, card)) {
+			if (AI.catchHand(card, hand)) {
 				return;
 			}
 			NullEntry.zeroDown(card);
 			return;
 		}
 
-		if (AI.catchHand(hand, card)) {
+		if (AI.catchHand(card, hand)) {
 			return;
 		}
 		if (AI.fullHouse(card, hand)) {
@@ -232,7 +232,7 @@ public class EndStrategy {
 				return;
 			}
 
-			if (AI.catchHand(hand, card)) {
+			if (AI.catchHand(card, hand)) {
 				return;
 			}
 
