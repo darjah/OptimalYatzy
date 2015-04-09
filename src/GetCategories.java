@@ -1,6 +1,6 @@
-//Part of the AI to caluculate which dices to rethrow and rethows them
+//Del av AIn som räknar ut vilka tärningar som ska kastas som och kastar om dem
 public class GetCategories {
-	//rethrows every dice in @hand that doesnt have the value @value
+	//Kastar om alla tärningar i @hand som inte har värdet @value
 	public static void allOfAKind(Hand hand, int value){
 		for(Dice dice : hand.getDices()){
 			if(dice.faceValue != value){
@@ -10,6 +10,34 @@ public class GetCategories {
 		hand.rollCounter();
 	}
 
+	//Kastar om tärningarna för att kunna få en liten stege
+	public static void smallStraight(Hand hand){
+		boolean[] straight = { false, false, false, false, false, false };
+		for (Dice dice : hand.getDices()){
+			if(straight[dice.getDiceValue() - 1] || dice.faceValue == 6){
+				dice.throwDice();
+			} 
+			else{
+				straight[dice.getDiceValue() - 1] = true;
+			}
+		}
+		hand.rollCounter();
+	}
+	
+	//Kastar om tärningarna för att kunna få en stor stege
+	public static void largeStraight(Hand hand) {
+		boolean[] straight = { false, false, false, false, false, false };
+		for (Dice dice : hand.getDices()){
+			if(straight[dice.getDiceValue() - 1] || dice.faceValue == 1){
+				dice.throwDice();
+			} 
+			else{
+				straight[dice.getDiceValue() - 1] = true;
+			}
+		}
+		hand.rollCounter();
+	}
+	
 	//rethrow a hand that has pair, tripple or quardruple to the higest value if there are more than two pairs.
 	public static void nrDices(Hand hand, int nrDices){
 		int[] diceFreq = new int [AI.diceMaxValue];
@@ -51,33 +79,7 @@ public class GetCategories {
 		hand.rollCounter();
 	}
 
-	//Kastar om tärningarna för att kunna få en liten stege
-	public static void smallStraight(Hand hand){
-		boolean[] straight = { false, false, false, false, false, false };
-		for (Dice dice : hand.getDices()){
-			if(straight[dice.getDiceValue() - 1] || dice.faceValue == 6){
-				dice.throwDice();
-			} 
-			else{
-				straight[dice.getDiceValue() - 1] = true;
-			}
-		}
-		hand.rollCounter();
-	}
-	
-	//Kastar om tärningarna för att kunna få en stor stege
-	public static void largeStraight(Hand hand) {
-		boolean[] straight = { false, false, false, false, false, false };
-		for (Dice dice : hand.getDices()){
-			if(straight[dice.getDiceValue() - 1] || dice.faceValue == 1){
-				dice.throwDice();
-			} 
-			else{
-				straight[dice.getDiceValue() - 1] = true;
-			}
-		}
-		hand.rollCounter();
-	}
+
 	
 	/////VAD VARFÖR EXAKT//Whatto do in case of full house on first or second throw. needs to know the status of the scorecard to do correct decission
 	public static void fullHouse(Scorecard card, Hand hand){

@@ -117,26 +117,157 @@ public class EarlyStrategy {
 			return true;
 		}
 		
+		//Kollar om vi kan fylla fyrtal, poäng över medel
+		else if(evalScores[Scorecard.fourOfAKind] >= 17.5 && emptyCategories.contains(Scorecard.fourOfAKind)){
+			card.categories[Scorecard.fourOfAKind] = evalScores[Scorecard.fourOfAKind];
+			return true;
+		}
+		
+		//Kollar om vi kan fylla triss, poäng över medel
+		else if(evalScores[Scorecard.threeOfAKind] >= 10.5 && emptyCategories.contains(Scorecard.threeOfAKind)){
+			card.categories[Scorecard.threeOfAKind] = evalScores[Scorecard.threeOfAKind];
+			return true;
+		}
+		
+		//Kollar om vi kan fylla tvåPar, poäng över medel
+		else if(evalScores[Scorecard.twoPair] >= 14 && emptyCategories.contains(Scorecard.twoPair)){
+			card.categories[Scorecard.twoPair] = evalScores[Scorecard.twoPair];
+			return true;
+		}
+
+		//Kollar om vi kan fylla par, poäng över medel
+		else if(evalScores[Scorecard.pair] >= 7 && emptyCategories.contains(Scorecard.pair)){
+			card.categories[Scorecard.pair] = evalScores[Scorecard.pair];
+			return true;
+		}
+		
+		//Kollar om vi kan fylla fyrtal
 		else if(evalScores[Scorecard.fourOfAKind] != 0 && emptyCategories.contains(Scorecard.fourOfAKind)){
 			card.categories[Scorecard.fourOfAKind] = evalScores[Scorecard.fourOfAKind];
 			return true;
 		}
 		
+		//Kollar om vi kan fylla triss
 		else if(evalScores[Scorecard.threeOfAKind] != 0 && emptyCategories.contains(Scorecard.threeOfAKind)){
 			card.categories[Scorecard.threeOfAKind] = evalScores[Scorecard.threeOfAKind];
 			return true;
 		}
 		
-		//Fångade inte kåken/har redan fångat den men kan placera tvåPar om den är ledig
+		//Kollar om vi kan fylla tvåPar
 		else if(evalScores[Scorecard.twoPair] != 0 && emptyCategories.contains(Scorecard.twoPair)){
 			card.categories[Scorecard.twoPair] = evalScores[Scorecard.twoPair];
 			return true;
 		}
 
-		//Fångade inte kåken/har redan fångat den men kan fylla par (par i 4 minst)
+		//Kollar om vi kan fylla par
 		else if(evalScores[Scorecard.pair] != 0 && emptyCategories.contains(Scorecard.pair)){
 			card.categories[Scorecard.pair] = evalScores[Scorecard.pair];
 			return true;
+		}
+		
+		//Vi kunde inte göra nåt bra med handen, returnera false och avgör vad som ska nollas
+		return false;
+	}
+
+	//Kollar om vi har del av en stege, saknar endast en till tärning
+	public static boolean checkBrokenStraight(Hand hand){
+		String s = new String();
+		for(int k : hand.getHandArray()){
+			if(!s.contains("" + k)){
+				s += k;
+			}
+		}
+
+		boolean first = s.contains("1234");
+		boolean second = s.contains("2345");
+		boolean third = s.contains("3456");
+
+		if(first || second || third){
+			return true;
+		}
+		return false;
+	}
+	
+	//Kollar vilken trasig stege vi har
+	public static boolean[] checkWhichBrokenStraightWeHave(Hand hand){
+		String s = new String();
+		for(int k : hand.getHandArray()){
+			if (!s.contains("" + k)) {
+				s += k;
+			}
+		}
+
+		boolean[] returning = new boolean[3];
+		returning[0] = s.contains("1234");
+		returning[1] = s.contains("2345");
+		returning[2] = s.contains("3456");
+		return returning;
+	}
+	
+	public static void goForStraight(Scorecard card, Hand hand, LinkedList<Integer> emptyCategories){
+		//Kollar vilken stege vi har
+		boolean[] straights = checkWhichBrokenStraightWeHave(hand);
+		
+		int[] diceFreq = new int [AI.diceMaxValue];
+		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+
+		//Om vi redan satt på en stege
+		if(AI.catchHand(card, hand)){
+			return;
+		}
+
+		//Gå för en stor stege om den är ledig
+		if(emptyCategories.contains(Scorecard.largeStraight)){
+			if(straights[1] || straights[2]){
+				GetCategories.largeStraight(hand);
+				if(AI.catchHand(card, hand)){
+					return;
+				}
+
+				GetCategories.largeStraight(hand);
+				if(AI.catchHand(card, hand)){
+					return;
+				}
+			}
+		}
+		
+		//Gå för en liten stege om den är ledig
+		if(emptyCategories.contains(Scorecard.smallStraight) && hand.getRoll() == 1){
+			if(straights[0] || straights[1]){
+				GetCategories.smallStraight(hand);
+				if(AI.catchHand(card, hand)){
+					return;
+				}
+
+				GetCategories.smallStraight(hand);
+				if(AI.catchHand(card, hand)){
+					return;
+				}
+			}
+		}
+		
+		//Då vi inte fick en stege
+		int[] evalScores = new int[15];
+		AI.evalScores(hand, evalScores);
+		
+		//Kolla om vi kan placera handen ändå
+		if(canWeDoAnythingWithThisHand(card, hand, evalScores, emptyCategories)){
+			return;
+		}
+		
+		//Om inte, nolla nere
+		boolean satteUppe = fillUpper(card, hand);
+		if(!satteUppe){
+			NullEntry.zeroUp(card);
+		}
+	}
+	
+	public static boolean fillUpper(Scorecard card, Hand hand){
+		for (int i = 0; i < 6; i++) {
+			if(card.categories[i] == -1){
+				card.categories[i] = AI.numberScore(hand.getHandArray(), i + 1);
+				return true;
+			}
 		}
 		return false;
 	}

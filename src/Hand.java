@@ -59,6 +59,13 @@ public class Hand {
 		return frequencyArray;
 	}
 	
+	//For testing
+	public void setDices(int[] values){
+		for(int i = 0; i < 5; i++){
+			dices[i].faceValue = values[i];
+		}
+	}
+	
 	public String toString(){
 		return(new StringBuilder(dices[0] + " " + dices[1] + " " + dices[2] + " " + dices[3]) + " " + dices[4]);
 	}
