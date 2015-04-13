@@ -66,7 +66,7 @@ public class Scorecard {
 		return -1;
 	}
 	
-	//TODO kollar om man fortfarande ligger onPar om man lägger i värdet i scorecarden
+	//Kollar om man fortfarande ligger onPar om man lägger i värdet i scorecarden
 	public boolean stillOnPar(Scorecard card, Hand hand){
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
 		int filledTotal = 0;

@@ -1,11 +1,25 @@
 import java.util.LinkedList;
 
 public class NullEntry {
-	final static int[] nullUp = {0, 1, 2, 3, 4, 5, 6, Scorecard.yatzy, Scorecard.smallStraight, Scorecard.largeStraight, Scorecard.fourOfAKind, 
-								Scorecard.fullHouse, Scorecard.threeOfAKind, Scorecard.twoPair, Scorecard.pair};
+	final static int[] onlyNullUp = {0, 1, 2, 3, 4, 5};
+	
+	final static int[] nullUp = {0, 1, 2, 3, 4, 5, Scorecard.yatzy, Scorecard.smallStraight, Scorecard.largeStraight, Scorecard.fourOfAKind, 
+								Scorecard.fullHouse, Scorecard.threeOfAKind, Scorecard.twoPair, Scorecard.pair, Scorecard.chance};
 	
 	final static int[] nullDown = {Scorecard.yatzy, Scorecard.smallStraight, Scorecard.largeStraight, Scorecard.fourOfAKind, 
-									Scorecard.fullHouse, Scorecard.threeOfAKind, Scorecard.twoPair, Scorecard.pair, 0, 1, 2, 3, 4, 5, 6};
+									Scorecard.fullHouse, Scorecard.threeOfAKind, Scorecard.twoPair, Scorecard.pair, 0, 1, 2, 3, 4, 5, Scorecard.chance};
+	
+	//Nolla endast första halvan
+	public static boolean onlyZeroUp(Scorecard card){
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		for(int i : onlyNullUp){
+			if(emptyCategories.contains(i)){
+				card.categories[i] = 0;
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	//Nolla första halvan
 	public static void zeroUp(Scorecard card){

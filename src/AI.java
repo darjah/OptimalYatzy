@@ -9,15 +9,8 @@ public class AI {
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
 		int turn = 15 - emptyCategories.size() + 1;
 
-		//turn <= earlyGame
-		//emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)
-		if(!card.doWeHaveBonus()){
-			if(card.possibleToGetBonus()){
-				EarlyStrategy.play(card, hand);
-			}
-			else{
-				MidStrategy.play(card, hand);
-			}
+		if(card.possibleToGetBonus()){
+			EarlyStrategy.play(card, hand);
 			return;
 		}
 
@@ -38,7 +31,7 @@ public class AI {
 		for(int i = 0; i < diceMaxValue; i++){
 			thisTurnScorecard[i] = diceFreq[i]*(i+1);
 		}
-		
+
 		thisTurnScorecard[Scorecard.pair] = pairScore(hand);
 		thisTurnScorecard[Scorecard.twoPair] = twoPairScore(hand);
 		thisTurnScorecard[Scorecard.threeOfAKind] = threeOfAKindScore(hand);
@@ -79,7 +72,7 @@ public class AI {
 
 		boolean firstPair = false;
 		int firstPairEyes = 0;
-		
+
 		for(int i = diceMaxValue; i > 0; i--){
 			if(diceFreq[i-1] >= 2 && !firstPair){
 				firstPair = true; //Första paret hittat
@@ -210,23 +203,24 @@ public class AI {
 		int largeStraightScore = AI.largeStraightScore(hand);
 		int yatzyScore = AI.yatzyScore(hand);
 
-		if((smallStraightScore != 0) && (freeScores.contains(Scorecard.smallStraight))){
-			card.categories[Scorecard.smallStraight] = smallStraightScore;
-			return true;
-		}
-		
-		if((largeStraightScore != 0) && (freeScores.contains(Scorecard.largeStraight))){
-			card.categories[Scorecard.largeStraight] = largeStraightScore;
-			return true;
-		}
-		
 		if((yatzyScore != 0) && (freeScores.contains(Scorecard.yatzy))){
 			card.categories[Scorecard.yatzy] = yatzyScore;
 			return true;
 		}
+
+		if((largeStraightScore != 0) && (freeScores.contains(Scorecard.largeStraight))){
+			card.categories[Scorecard.largeStraight] = largeStraightScore;
+			return true;
+		}
+
+		if((smallStraightScore != 0) && (freeScores.contains(Scorecard.smallStraight))){
+			card.categories[Scorecard.smallStraight] = smallStraightScore;
+			return true;
+		}
+
 		return false;
 	}
-	
+
 	//Kolla om vi har en kåk och placerar den i protokollet
 	public static boolean fullHouse(Scorecard card, Hand hand){
 		int score = fullHouseScore(hand);
@@ -237,8 +231,7 @@ public class AI {
 		return false;
 	}
 
-
-	//Beräkna poäng för one-of-a-kind. Summerar poängen för de tärningar som har det givna värdet number, BORDE FLYTTAS TILL HAND?
+	//Beräkna poäng för one-of-a-kind. Summerar poängen för de tärningar som har det givna värdet number, BORDE FLYTTAS TILL HAND? Finns i early och mid, avveckla
 	public static int numberScore(int[] dices, int number) {
 		int score = 0;
 		for (int i : dices) {

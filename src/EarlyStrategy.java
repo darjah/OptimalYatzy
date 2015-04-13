@@ -12,6 +12,13 @@ public class EarlyStrategy {
 			return;
 		}
 		
+		//Om vi har början på en stege, slå efter stege
+		if(checkBrokenStraight(hand)){
+			goForStraight(card, hand, emptyCategories);
+			return;
+		}
+		
+		//Om ingen stege
 		//Första iterationen av att kolla vad som ska behållas och kasta om tärningarna där efter
 		int valueToKeep = valueToKeep(card, hand, diceFrequency);
 		GetCategories.allOfAKind(hand, valueToKeep);
@@ -26,11 +33,20 @@ public class EarlyStrategy {
 		if(valueToKeep == -1){
 			//Om vi fortfarande kan få bonusen, kolla om handen kan placeras i nerdre delen, annars nolla
 			if(card.possibleToGetBonus()){
-				//TODO lägg in koll för handen om den kan placeras i nedre del
 				AI.evalScores(hand, evalScores);
 				
-				//Kollar om vi kan göra nåt med handen ändå
-				if(canWeDoAnythingWithThisHand(card, hand, evalScores, emptyCategories)){
+				//Kollar om vi kan göra nåt bra med handen ändå
+				if(canWeDoAnythingGoodWithThisHand(card, hand, evalScores, emptyCategories)){
+					return;
+				}
+				
+				//Kolla om vi kan lägga handen i toppen och ändå ligga över onPar
+				if(card.stillOnPar(card, hand)){
+					return;
+				}
+				
+				//Kollar om vi kan placera handen i botten ändå
+				if(canWeDoAnythingBadWithThisHand(card, hand, evalScores, emptyCategories)){
 					return;
 				}
 				
@@ -38,22 +54,37 @@ public class EarlyStrategy {
 				NullEntry.nullEntry(card);
 				return;
 			}
+			
 			//Då vi inte längre kan få bonusen, kolla om handen kan läggas i nedre delen annars lägg i det bästa i övre halvan
 			else{
-				//Kollar om vi kan göra nåt med handen ändå
-				if(canWeDoAnythingWithThisHand(card, hand, evalScores, emptyCategories)){
+				//Kollar om vi kan göra nåt bra med handen ändå
+				if(canWeDoAnythingGoodWithThisHand(card, hand, evalScores, emptyCategories)){
 					return;
 				}
+				
 				//Kollar om vi kan lägga det bästa värdet i övre halvan ändå
 				else if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
 					int highestValue = 0;
-					for(int diceValueTemp = AI.diceMaxValue; diceValueTemp > 0 ; diceValueTemp--){
+					int diceValueTemp;
+					for(diceValueTemp = AI.diceMaxValue; diceValueTemp > 0 ; diceValueTemp--){
 						if((diceFrequency[diceValueTemp-1]*diceValueTemp > highestValue) && (emptyCategories.contains(diceValueTemp-1))){
 							highestValue = diceFrequency[diceValueTemp-1]*diceValueTemp;
 						}
 					}
-					card.categories[valueToKeep - 1] = highestValue;
+					card.categories[diceValueTemp - 1] = highestValue;
+					return;
 				}
+				
+				//Nollar endast kategori 1-6 om de är lediga
+				else if(NullEntry.onlyZeroUp(card)){
+					return;
+				}
+				
+				//Kollar om vi kan göra nåt med handen ändå
+				else if(canWeDoAnythingBadWithThisHand(card, hand, evalScores, emptyCategories)){
+					return;
+				}
+				
 				//I värsta fall, nolla
 				else{
 					NullEntry.nullEntry(card);
@@ -81,7 +112,7 @@ public class EarlyStrategy {
 
 		//Första och andra kastet
 		if(hand.getRoll() < 3){
-			//Satsar på den hösta frekvensen på tärningarna 
+			//Satsar på den hösta frekvensen av tärningarna 
 			int highestFreq = 0;
 			for(int diceValueTemp = AI.diceMaxValue; diceValueTemp > 0; diceValueTemp--){
 				if((diceFreq[diceValueTemp-1] > highestFreq) && (emptyCategories.contains(diceValueTemp-1))){
@@ -106,7 +137,7 @@ public class EarlyStrategy {
 		}
 	}
 	
-	public static boolean canWeDoAnythingWithThisHand(Scorecard card, Hand hand, int[] evalScores, LinkedList<Integer> emptyCategories){
+	public static boolean canWeDoAnythingGoodWithThisHand(Scorecard card, Hand hand, int[] evalScores, LinkedList<Integer> emptyCategories){
 		//Kollar efter kåk
 		if(AI.fullHouse(card, hand)){
 			return true;
@@ -141,8 +172,19 @@ public class EarlyStrategy {
 			return true;
 		}
 		
+		//Kollar om vi kan fylla chans, poäng över medel
+		else if(evalScores[Scorecard.chance] >= 17.5 && emptyCategories.contains(Scorecard.chance)){
+			card.categories[Scorecard.chance] = evalScores[Scorecard.chance];
+			return true;
+		}
+		
+		//Vi kunde inte göra nåt bra med handen, returnera false och avgör vad som ska nollas
+		return false;
+	}
+	
+	public static boolean canWeDoAnythingBadWithThisHand(Scorecard card, Hand hand, int[] evalScores, LinkedList<Integer> emptyCategories){
 		//Kollar om vi kan fylla fyrtal
-		else if(evalScores[Scorecard.fourOfAKind] != 0 && emptyCategories.contains(Scorecard.fourOfAKind)){
+		if(evalScores[Scorecard.fourOfAKind] != 0 && emptyCategories.contains(Scorecard.fourOfAKind)){
 			card.categories[Scorecard.fourOfAKind] = evalScores[Scorecard.fourOfAKind];
 			return true;
 		}
@@ -165,10 +207,16 @@ public class EarlyStrategy {
 			return true;
 		}
 		
+		//Kollar om vi kan fylla chans
+		else if(evalScores[Scorecard.chance] != 0 && emptyCategories.contains(Scorecard.chance)){
+			card.categories[Scorecard.chance] = evalScores[Scorecard.chance];
+			return true;
+		}
+		
 		//Vi kunde inte göra nåt bra med handen, returnera false och avgör vad som ska nollas
 		return false;
 	}
-
+	
 	//Kollar om vi har del av en stege, saknar endast en till tärning
 	public static boolean checkBrokenStraight(Hand hand){
 		String s = new String();
@@ -207,9 +255,6 @@ public class EarlyStrategy {
 	public static void goForStraight(Scorecard card, Hand hand, LinkedList<Integer> emptyCategories){
 		//Kollar vilken stege vi har
 		boolean[] straights = checkWhichBrokenStraightWeHave(hand);
-		
-		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
 
 		//Om vi redan satt på en stege
 		if(AI.catchHand(card, hand)){
@@ -251,24 +296,64 @@ public class EarlyStrategy {
 		AI.evalScores(hand, evalScores);
 		
 		//Kolla om vi kan placera handen ändå
-		if(canWeDoAnythingWithThisHand(card, hand, evalScores, emptyCategories)){
+		if(card.possibleToGetBonus()){
+			//Kollar om vi kan göra nåt bra med handen ändå
+			if(canWeDoAnythingGoodWithThisHand(card, hand, evalScores, emptyCategories)){
+				return;
+			}
+			
+			//Kolla om vi kan lägga handen i toppen och ändå ligga över onPar
+			if(card.stillOnPar(card, hand)){
+				return;
+			}
+			
+			//Kollar om vi kan placera handen i botten ändå
+			if(canWeDoAnythingBadWithThisHand(card, hand, evalScores, emptyCategories)){
+				return;
+			}
+			
+			//I värsta fall, nolla
+			NullEntry.nullEntry(card);
 			return;
 		}
-		
-		//Om inte, nolla nere
-		boolean satteUppe = fillUpper(card, hand);
-		if(!satteUppe){
-			NullEntry.zeroUp(card);
-		}
-	}
-	
-	public static boolean fillUpper(Scorecard card, Hand hand){
-		for (int i = 0; i < 6; i++) {
-			if(card.categories[i] == -1){
-				card.categories[i] = AI.numberScore(hand.getHandArray(), i + 1);
-				return true;
+		//Då vi inte längre kan få bonusen, kolla om handen kan läggas i nedre delen annars lägg i det bästa i övre halvan
+		else{
+			//Kollar om vi kan göra nåt bra med handen ändå
+			if(canWeDoAnythingGoodWithThisHand(card, hand, evalScores, emptyCategories)){
+				return;
+			}
+			
+			//Kollar om vi kan lägga det bästa värdet i övre halvan ändå
+			
+			else if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
+				int highestValue = 0;
+				int diceValueTemp;
+				int[] diceFreq = new int [AI.diceMaxValue];
+				diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+				
+				for(diceValueTemp = AI.diceMaxValue; diceValueTemp > 0 ; diceValueTemp--){
+					if((diceFreq[diceValueTemp-1]*diceValueTemp > highestValue) && (emptyCategories.contains(diceValueTemp-1))){
+						highestValue = diceFreq[diceValueTemp-1]*diceValueTemp;
+					}
+				}
+				card.categories[diceValueTemp - 1] = highestValue;
+				return;
+			}
+			
+			//Nollar endast kategori 1-6 om de är lediga
+			else if(NullEntry.onlyZeroUp(card)){
+				return;
+			}
+			
+			//Kollar om vi kan göra nåt med handen ändå
+			else if(canWeDoAnythingBadWithThisHand(card, hand, evalScores, emptyCategories)){
+				return;
+			}
+			
+			//I värsta fall, nolla
+			else{
+				NullEntry.nullEntry(card);
 			}
 		}
-		return false;
 	}
 }

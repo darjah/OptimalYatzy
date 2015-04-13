@@ -1,12 +1,10 @@
-import static org.junit.Assert.*;
-
 import java.util.LinkedList;
 
 import org.junit.Test;
 
 
 public class test {
-	public void test() {
+	public test() {
 		Scorecard card = new Scorecard();
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
 		Hand hand = new Hand();
@@ -21,7 +19,7 @@ public class test {
 	@Test
 	public void test2(){
 		Scorecard card = new Scorecard();
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		//LinkedList<Integer> emptyCategories = card.getEmptyCategories();
 		Hand hand = new Hand();
 		int[] dice = {3,3,4,4,5};
 		hand.setDices(dice);
