@@ -50,7 +50,7 @@ public class Scorecard {
 				parScore += categories[i];
 			} 
 			else{
-				parScore += i * 3;
+				parScore += (i+1) * 3;
 			}
 		}
 		
@@ -67,28 +67,48 @@ public class Scorecard {
 	}
 	
 	//TODO kollar om man fortfarande ligger onPar om man lägger i värdet i scorecarden
-	public int stillOnPar(int value, int[] diceFreq){
-		int parScore = 0;
-
-		for(int i = 0; i <= sixes; i++){
+	public boolean stillOnPar(Scorecard card, Hand hand){
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		int filledTotal = 0;
+		int prelTotal = 0;
+		boolean[] freeOneToSixes = new boolean[6];
+		int[] diceFreq = new int [AI.diceMaxValue];
+		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		
+		//Kollar vad vi har fyllt hittills
+		for(int i = 0; i < diceFreq.length; i++){
 			if(categories[i] >= 0){
-				parScore += categories[i];
-			} 
+				filledTotal += categories[i];
+			}
+			//Om kategorin är tom, spara undan detta
 			else{
-				parScore += i * 3;
+				freeOneToSixes[i] = true;
 			}
 		}
 		
-		//Om över onPar, ret 1
-		if(parScore > pointsToBonus){
-			return 1;
+		//Undersöker om vi kan placera en valör utan att riskera bonusen
+		for(int i = 0; i < diceFreq.length; i++){
+			//Hittar ett värde att testa på
+			if(diceFreq[i] > 0 && emptyCategories.contains(i)){
+				freeOneToSixes[i] = false;
+				prelTotal = filledTotal + (diceFreq[i]*(i+1));
+				
+				//Alla fria kategorier (förutom den valda ovan) *3 läggs till prelTotal
+				for(int j = 0; j < freeOneToSixes.length; j++){
+					if(freeOneToSixes[j] == true){
+						prelTotal += (j+1) * 3;
+					}
+				}
+				
+				//Om prelTotal fortfarande ger oss bonusen så returnerar vi den valören som vi kan fylla
+				if(prelTotal >= 63){
+					card.categories[i] = diceFreq[i]*(i+1);
+					return true;
+				}
+			}
 		}
-		//Om onPar, ret 0
-		if(parScore == pointsToBonus){
-			return 0;
-		}
-		//Om under onPar, ret -1
-		return -1;
+		//Om alla val resulterar i att vi ligger under onPar
+		return false;
 	}
 	
 	public boolean possibleToGetBonus(){
@@ -133,5 +153,10 @@ public class Scorecard {
 			total += bonus;
 		}
 		return total;
+	}
+	
+	//For testing
+	public void setScores(int[] array){
+		categories = array;
 	}
 }
