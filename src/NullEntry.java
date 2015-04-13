@@ -3,10 +3,10 @@ import java.util.LinkedList;
 public class NullEntry {
 	final static int[] onlyNullUp = {0, 1, 2, 3, 4, 5};
 	
-	final static int[] nullUp = {0, 1, 2, 3, 4, 5, Scorecard.yatzy, Scorecard.smallStraight, Scorecard.largeStraight, Scorecard.fourOfAKind, 
+	final static int[] nullUp = {0, 1, 2, 3, 4, 5, Scorecard.smallStraight, Scorecard.largeStraight, Scorecard.yatzy, Scorecard.fourOfAKind, 
 								Scorecard.fullHouse, Scorecard.threeOfAKind, Scorecard.twoPair, Scorecard.pair, Scorecard.chance};
 	
-	final static int[] nullDown = {Scorecard.yatzy, Scorecard.smallStraight, Scorecard.largeStraight, Scorecard.fourOfAKind, 
+	final static int[] nullDown = {Scorecard.smallStraight, Scorecard.largeStraight, Scorecard.fourOfAKind, Scorecard.yatzy, 
 									Scorecard.fullHouse, Scorecard.threeOfAKind, Scorecard.twoPair, Scorecard.pair, 0, 1, 2, 3, 4, 5, Scorecard.chance};
 	
 	//Nolla endast första halvan

@@ -3,7 +3,7 @@ import java.util.LinkedList;
 public class AI {
 	final static public int diceMaxValue = 6;
 	final static public int earlyGame = 6;
-	final static public int midGame = 11;
+	final static public int midGame = 15;
 
 	public static void play(Scorecard card, Hand hand) {
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories();

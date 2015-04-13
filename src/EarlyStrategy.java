@@ -4,8 +4,8 @@ public class EarlyStrategy {
 	public static void play(Scorecard card, Hand hand){
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
 		int[] evalScores = new int[card.categories.length];
-		int[] diceFrequency = new int[AI.diceMaxValue];
-		diceFrequency = hand.diceFrequency(hand.getHandArray(), diceFrequency);
+		int[] diceFreq = new int[AI.diceMaxValue];
+		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
 		
 		//Kolla om vi har stege eller yatzy
 		if(AI.catchHand(card, hand)){
@@ -20,14 +20,14 @@ public class EarlyStrategy {
 		
 		//Om ingen stege
 		//Första iterationen av att kolla vad som ska behållas och kasta om tärningarna där efter
-		int valueToKeep = valueToKeep(card, hand, diceFrequency);
+		int valueToKeep = valueToKeep(card, hand, diceFreq);
 		GetCategories.allOfAKind(hand, valueToKeep);
-		diceFrequency = hand.diceFrequency(hand.getHandArray(), diceFrequency);
+		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
 
 		//Andra och sista iterationen
-		valueToKeep = valueToKeep(card, hand, diceFrequency);
+		valueToKeep = valueToKeep(card, hand, diceFreq);
 		GetCategories.allOfAKind(hand, valueToKeep);
-		diceFrequency = hand.diceFrequency(hand.getHandArray(), diceFrequency);
+		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
 
 		//Då vi inte hittade ett vettigt värde (freq < 3)
 		if(valueToKeep == -1){
@@ -67,8 +67,8 @@ public class EarlyStrategy {
 					int highestValue = 0;
 					int diceValueTemp;
 					for(diceValueTemp = AI.diceMaxValue; diceValueTemp > 0 ; diceValueTemp--){
-						if((diceFrequency[diceValueTemp-1]*diceValueTemp > highestValue) && (emptyCategories.contains(diceValueTemp-1))){
-							highestValue = diceFrequency[diceValueTemp-1]*diceValueTemp;
+						if((diceFreq[diceValueTemp-1]*diceValueTemp > highestValue) && (emptyCategories.contains(diceValueTemp-1))){
+							highestValue = diceFreq[diceValueTemp-1]*diceValueTemp;
 						}
 					}
 					card.categories[diceValueTemp - 1] = highestValue;
@@ -138,16 +138,16 @@ public class EarlyStrategy {
 	}
 	
 	public static boolean canWeDoAnythingGoodWithThisHand(Scorecard card, Hand hand, int[] evalScores, LinkedList<Integer> emptyCategories){
-		//Kollar efter kåk
-		if(AI.fullHouse(card, hand)){
-			return true;
-		}
-		
 		//Kollar efter yatzy, liten och storstege
-		else if(AI.catchHand(card, hand)){
+		if(AI.catchHand(card, hand)){
 			return true;
 		}
 		
+		//Kollar efter kåk
+		else if(AI.fullHouse(card, hand)){
+			return true;
+		}
+			
 		//Kollar om vi kan fylla fyrtal, poäng över medel
 		else if(evalScores[Scorecard.fourOfAKind] >= 17.5 && emptyCategories.contains(Scorecard.fourOfAKind)){
 			card.categories[Scorecard.fourOfAKind] = evalScores[Scorecard.fourOfAKind];
@@ -183,6 +183,16 @@ public class EarlyStrategy {
 	}
 	
 	public static boolean canWeDoAnythingBadWithThisHand(Scorecard card, Hand hand, int[] evalScores, LinkedList<Integer> emptyCategories){
+		//Kollar efter yatzy, liten och storstege
+		if(AI.catchHand(card, hand)){
+			return true;
+		}
+		
+		//Kollar efter kåk
+		else if(AI.fullHouse(card, hand)){
+			return true;
+		}
+		
 		//Kollar om vi kan fylla fyrtal
 		if(evalScores[Scorecard.fourOfAKind] != 0 && emptyCategories.contains(Scorecard.fourOfAKind)){
 			card.categories[Scorecard.fourOfAKind] = evalScores[Scorecard.fourOfAKind];
@@ -324,7 +334,6 @@ public class EarlyStrategy {
 			}
 			
 			//Kollar om vi kan lägga det bästa värdet i övre halvan ändå
-			
 			else if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
 				int highestValue = 0;
 				int diceValueTemp;
@@ -336,8 +345,10 @@ public class EarlyStrategy {
 						highestValue = diceFreq[diceValueTemp-1]*diceValueTemp;
 					}
 				}
-				card.categories[diceValueTemp - 1] = highestValue;
-				return;
+				if(diceValueTemp != 0){
+					card.categories[diceValueTemp-1] = highestValue;
+					return;
+				}
 			}
 			
 			//Nollar endast kategori 1-6 om de är lediga

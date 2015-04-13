@@ -38,6 +38,35 @@ public class GetCategories {
 		hand.rollCounter();
 	}
 	
+	//Om vi sitter på två par och vill ha en kåk, används i getFullHouse
+	public static void twoPairToFullHouse(Hand hand){
+		int i = 0;
+		int j = 0;
+
+		int[] diceFreq = new int [AI.diceMaxValue];
+		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		
+		//Hittar paren
+		for(int c = diceFreq.length - 1; c >= 0; c--){
+			if(diceFreq[c] == 2){
+				if(i == 0){
+					i = c + 1;
+				}
+				else{
+					j = c + 1;
+				}
+			}
+		}
+
+		for(Dice dice : hand.getDices()){
+			if(dice.faceValue != i && dice.faceValue != j){
+				dice.throwDice();
+			}
+		}
+		
+		hand.rollCounter();
+	}
+	
 	//rethrow a hand that has pair, tripple or quardruple to the higest value if there are more than two pairs.
 	public static void nrDices(Hand hand, int nrDices){
 		int[] diceFreq = new int [AI.diceMaxValue];
@@ -199,34 +228,7 @@ public class GetCategories {
 		}
 		hand.rollCounter();
 	}
-	
-	//Om vi sitter på två par och vill ha en kåk, används i getFullHouse
-	public static void twoPairToFullHouse(Hand hand){
-		int i = 0;
-		int j = 0;
-
-		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
-
-		for(int c = diceFreq.length - 1; c >= 0; c--){
-			if(diceFreq[c] == 2){
-				if(i == 0){
-					i = c + 1;
-				}
-				else{
-					j = c + 1;
-				}
-			}
-		}
-
-		for(Dice dice : hand.getDices()){
-			if(dice.faceValue != i && dice.faceValue != j){
-				dice.throwDice();
-			}
-		}
-		hand.rollCounter();
-	}
-	
+		
 	//För att kunna få två olika par
 	public static void getTwoPair(Hand hand){
 		int[] diceFreq = new int [AI.diceMaxValue];
