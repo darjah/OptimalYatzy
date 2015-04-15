@@ -6,7 +6,7 @@ public class EndStrategy {
 	}
 
 	public static void agressive(Scorecard card, Hand hand){
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		int[] evalScoress = new int[card.categories.length];
 		AI.evalScores(hand, evalScoress);
 
@@ -54,8 +54,8 @@ public class EndStrategy {
 			return;
 		}
 
-		if ((card.getEmptyCategories().size() == 1 && card.categories[Scorecard.smallStraight] == -1)
-				|| (card.getEmptyCategories().size() == 2
+		if ((card.getEmptyCategories(card).size() == 1 && card.categories[Scorecard.smallStraight] == -1)
+				|| (card.getEmptyCategories(card).size() == 2
 				&& card.categories[Scorecard.smallStraight] == -1 && card.categories[Scorecard.chance] == -1)) {
 			GetCategories.smallStraight(hand);
 			GetCategories.smallStraight(hand);
@@ -67,8 +67,8 @@ public class EndStrategy {
 
 		}
 
-		if ((card.getEmptyCategories().size() == 1 && card.categories[Scorecard.largeStraight] == -1)
-				|| (card.getEmptyCategories().size() == 2
+		if ((card.getEmptyCategories(card).size() == 1 && card.categories[Scorecard.largeStraight] == -1)
+				|| (card.getEmptyCategories(card).size() == 2
 				&& card.categories[Scorecard.largeStraight] == -1 && card.categories[Scorecard.chance] == -1)) {
 			GetCategories.largeStraight(hand);
 			GetCategories.largeStraight(hand);
@@ -79,8 +79,8 @@ public class EndStrategy {
 			return;
 		}
 
-		if ((card.getEmptyCategories().size() == 2 && (card.categories[Scorecard.smallStraight] == -1 && card.categories[Scorecard.largeStraight] == -1)) 
-				|| (card.getEmptyCategories().size() == 3 && (card.categories[Scorecard.smallStraight] == -1
+		if ((card.getEmptyCategories(card).size() == 2 && (card.categories[Scorecard.smallStraight] == -1 && card.categories[Scorecard.largeStraight] == -1)) 
+				|| (card.getEmptyCategories(card).size() == 3 && (card.categories[Scorecard.smallStraight] == -1
 				&& card.categories[Scorecard.largeStraight] == -1 && card.categories[Scorecard.chance] == -1))) {
 			GetCategories.largeStraight(hand);
 			if (AI.catchHand(card, hand)) {
@@ -177,10 +177,10 @@ public class EndStrategy {
 	 * @return 1 liten stege, 2 stor stege, 0 ingen stege
 	 */
 	public static int stegCheck(Scorecard card, Hand hand) {
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 
 		String s = new String();
-		for (int k : hand.getHandArray()) {
+		for (int k : hand.getHandArray(hand)) {
 			if (!s.contains("" + k)) {
 				s += k;
 			}
@@ -270,7 +270,7 @@ public class EndStrategy {
 		}
 	}
 	public static void allOfAKindAgressive(Scorecard card, Hand hand, int kept) {
-		LinkedList<Integer> freeScores = card.getEmptyCategories();
+		LinkedList<Integer> freeScores = card.getEmptyCategories(card);
 
 		boolean checked = AI.catchHand(card, hand);
 		if (checked) {

@@ -3,13 +3,13 @@ import java.util.LinkedList;
 public class AI {
 	final static public int diceMaxValue = 6;
 	final static public int earlyGame = 6;
-	final static public int midGame = 15;
+	final static public int midGame = 11;
 
 	public static void play(Scorecard card, Hand hand) {
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		int turn = 15 - emptyCategories.size() + 1;
 
-		if(card.possibleToGetBonus()){
+		if(card.possibleToGetBonus(card)){
 			EarlyStrategy.play(card, hand);
 			return;
 		}
@@ -27,7 +27,7 @@ public class AI {
 	public static void evalScores(Hand hand, int[] thisTurnScorecard) {
 		//Poäng för kategori 1-6.
 		int[] diceFreq = new int [diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		for(int i = 0; i < diceMaxValue; i++){
 			thisTurnScorecard[i] = diceFreq[i]*(i+1);
 		}
@@ -47,7 +47,7 @@ public class AI {
 		int highestScore = 0;
 		int[] scores = new int[diceMaxValue];
 		int[] diceFreq = new int [diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		//Hitta paren genom att kolla frekvenslistan, par om diceFreq[i]>=2
 		for(int i = 0; i < diceMaxValue; i++){
@@ -68,7 +68,7 @@ public class AI {
 	public static int twoPairScore(Hand hand){
 		int highestScore = 0;
 		int[] diceFreq = new int [diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		boolean firstPair = false;
 		int firstPairEyes = 0;
@@ -89,7 +89,7 @@ public class AI {
 	public static int threeOfAKindScore(Hand hand){
 		int score = 0;
 		int[] diceFreq = new int [diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		//Hitta trissen genom att kolla frekvenslistan, triss om >=3
 		for(int i = 0; i < diceMaxValue; i++){
@@ -103,7 +103,7 @@ public class AI {
 	public static int fourOfAKindScore(Hand hand){
 		int score = 0;
 		int[] diceFreq = new int [diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		//Hitta fyrtal genom att kolla frekvenslistan, fyrtal om >=4
 		for(int i = 0; i < diceMaxValue; i++){
@@ -116,7 +116,7 @@ public class AI {
 
 	public static int smallStraightScore(Hand hand) {
 		int score = 0;
-		int[] thisHand = hand.getHandArray();
+		int[] thisHand = hand.getHandArray(hand);
 		boolean smallStraightTrue = true;
 
 		for(int i = 0; i < 5; i++){
@@ -134,7 +134,7 @@ public class AI {
 
 	public static int largeStraightScore(Hand hand){
 		int score = 0;
-		int[] thisHand = hand.getHandArray();
+		int[] thisHand = hand.getHandArray(hand);
 		boolean largeStraightTrue = true;
 
 		for(int i = 0; i < 5; i++){
@@ -153,7 +153,7 @@ public class AI {
 	public static int fullHouseScore(Hand hand) {
 		int score = 0;
 		int[] diceFreq = new int [diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		int pairEyes = 0;
 		int trippleEyes = 0;
@@ -176,7 +176,7 @@ public class AI {
 
 	public static int chansScore(Hand hand){
 		int sum = 0;
-		for(int i : hand.getHandArray()){
+		for(int i : hand.getHandArray(hand)){
 			sum += i;
 		}
 		return sum;
@@ -184,7 +184,7 @@ public class AI {
 
 	public static int yatzyScore(Hand hand){
 		int[] diceFreq = new int [diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		for(int i : diceFreq) {
 			if(i == 5){
@@ -196,7 +196,7 @@ public class AI {
 	}
 
 	public static boolean catchHand(Scorecard card, Hand hand){
-		LinkedList<Integer> freeScores = card.getEmptyCategories();
+		LinkedList<Integer> freeScores = card.getEmptyCategories(card);
 
 		//Kolla om vi har stege eller yatzy
 		int smallStraightScore = AI.smallStraightScore(hand);

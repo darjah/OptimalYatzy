@@ -11,7 +11,7 @@ public class NullEntry {
 	
 	//Nolla endast första halvan
 	public static boolean onlyZeroUp(Scorecard card){
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		for(int i : onlyNullUp){
 			if(emptyCategories.contains(i)){
 				card.categories[i] = 0;
@@ -23,7 +23,7 @@ public class NullEntry {
 	
 	//Nolla första halvan
 	public static void zeroUp(Scorecard card){
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		for(int i : nullUp){
 			if(emptyCategories.contains(i)){
 				card.categories[i] = 0;
@@ -34,7 +34,7 @@ public class NullEntry {
 
 	//Nolla andra halvan
 	public static void zeroDown(Scorecard card){
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		for(int i : nullDown){
 			if(emptyCategories.contains(i)){
 				card.categories[i] = 0;
@@ -45,7 +45,7 @@ public class NullEntry {
 
 	public static void nullEntry(Scorecard card){	
 		//När vi redan har bonusen eller det inte längre är möjligt att få den
-		if(card.doWeHaveBonus() || !card.possibleToGetBonus()){
+		if(card.doWeHaveBonus(card) || !card.possibleToGetBonus(card)){
 			NullEntry.zeroUp(card);
 		}
 		/*//När vi ligger över onPar

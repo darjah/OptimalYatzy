@@ -44,7 +44,7 @@ public class GetCategories {
 		int j = 0;
 
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		
 		//Hittar paren
 		for(int c = diceFreq.length - 1; c >= 0; c--){
@@ -70,7 +70,7 @@ public class GetCategories {
 	//rethrow a hand that has pair, tripple or quardruple to the higest value if there are more than two pairs.
 	public static void nrDices(Hand hand, int nrDices){
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		int valueToKeep = 1;
 
 		for(int i = 0; i < 6; i++){
@@ -90,7 +90,7 @@ public class GetCategories {
 	//requires a twoPair hand in to work correctly
 	public static void twoPair(Hand hand){
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		int valueToRethrow = 1;
 		for(int i = 0; i < diceFreq.length; i++){
@@ -114,7 +114,7 @@ public class GetCategories {
 	public static void fullHouse(Scorecard card, Hand hand){
 		int roll = hand.getRoll();
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		int weHaveThree = 0;
 		
 		for(int i = 0; i < diceFreq.length; i++){
@@ -159,7 +159,7 @@ public class GetCategories {
 	//Kommer kolla om man har triss först, sen två par, ett par och sedan enstaka tärningar
 	public static void getFullHouse(Hand hand){
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		int valueToKeep;
 		int trissScore = AI.threeOfAKindScore(hand);
@@ -232,7 +232,7 @@ public class GetCategories {
 	//För att kunna få två olika par
 	public static void getTwoPair(Hand hand){
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		int keep1 = 0;
 		int keep2 = 0;

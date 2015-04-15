@@ -8,7 +8,7 @@ public class MidStrategy {
 		}
 
 		//Om vi inte har bonusen i detta skede behöver vi alla poäng vi kan få, spela defensivt
-		if(!card.doWeHaveBonus()){
+		if(!card.doWeHaveBonus(card)){
 			underPar(card, hand);
 			return;
 		} 
@@ -21,7 +21,7 @@ public class MidStrategy {
 	}
 
 	public static void underPar(Scorecard card, Hand hand){
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 
 		//Fånga liten/stor stege eller yatzy direkt
 		if(AI.catchHand(card, hand)){
@@ -60,7 +60,7 @@ public class MidStrategy {
 
 	//När vi har bonusen och kan spela aggressivt
 	public static void overPar(Scorecard card, Hand hand) {
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		int[] evalScores = new int[card.categories.length];
 		AI.evalScores(hand, evalScores);
 
@@ -113,14 +113,14 @@ public class MidStrategy {
 		AI.evalScores(hand, evalScores);
 
 		//Kollar om vi kan göra nåt bra med handen 
-		if(EarlyStrategy.canWeDoAnythingGoodWithThisHand(card, hand, evalScores, emptyCategories)){
+		if(EarlyStrategy.canWeDoAnythingGoodWithThisHand(card, hand, evalScores)){
 			return;
 		}
 
 		//Kollar om vi kan lägga det bästa värdet i övre halvan ändå
 		if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
 			int[] diceFreq = new int [AI.diceMaxValue];
-			diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+			diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 			int highestValue = 0;
 			int diceValueTemp = 0;
 
@@ -137,7 +137,7 @@ public class MidStrategy {
 		}
 
 		//Kollar om vi kan placera handen i botten ändå
-		if(EarlyStrategy.canWeDoAnythingBadWithThisHand(card, hand, evalScores, emptyCategories)){
+		if(EarlyStrategy.canWeDoAnythingBadWithThisHand(card, hand, evalScores)){
 			return;
 		}
 
@@ -149,7 +149,7 @@ public class MidStrategy {
 	//Räknar ut vilket värde att satsa på och returnerar det
 	public static int valueToKeep(Scorecard card, Hand hand) {
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
 		int valueToKeep = 0;
 		int highestFreq = 0;
@@ -167,7 +167,7 @@ public class MidStrategy {
 	public static int betOnInt(Scorecard card, Hand hand){
 		//LinkedList<Integer> emptyCategories = card.getEmptyCategories();
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		int value = 1;
 
 		// omedlbart satsa pa mer en fyra av en sort
@@ -210,19 +210,19 @@ public class MidStrategy {
 	}
 
 	public static void endMove(Scorecard card, Hand hand){
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		int[] evalScores = new int[card.categories.length];
 		AI.evalScores(hand, evalScores);
 		
 		//Kollar om vi kan göra nåt bra med handen 
-		if(EarlyStrategy.canWeDoAnythingGoodWithThisHand(card, hand, evalScores, emptyCategories)){
+		if(EarlyStrategy.canWeDoAnythingGoodWithThisHand(card, hand, evalScores)){
 			return;
 		}
 
 		//Kollar om vi kan lägga det bästa värdet i övre halvan ändå
 		if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
 			int[] diceFreq = new int [AI.diceMaxValue];
-			diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+			diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 			int highestValue = 0;
 			int diceValueTemp = 0;
 
@@ -239,7 +239,7 @@ public class MidStrategy {
 		}
 
 		//Kollar om vi kan placera handen i botten ändå
-		if(EarlyStrategy.canWeDoAnythingBadWithThisHand(card, hand, evalScores, emptyCategories)){
+		if(EarlyStrategy.canWeDoAnythingBadWithThisHand(card, hand, evalScores)){
 			return;
 		}
 

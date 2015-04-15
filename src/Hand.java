@@ -14,52 +14,37 @@ public class Hand {
 		return roll;
 	}
 	
+	//När man kastar om tärningarna
 	public void rollCounter(){
 		roll++;
 	}
-
+	
+	//Ger tärningsobjekten
 	public Dice[] getDices(){
 		return dices; 
 	}
-
-	public void rethrowHand(int[] dicesToRethrow){
-		for(int i : dicesToRethrow){
-			dices[i].throwDice();
-		}
-		roll ++;
-	}
-
-	public Dice getHandDice(int index){
-		return dices[index];
-	}
-
-	public int getHandValue(){
-		int score = 0 ;
-		for(int i = 0; i < dices.length; i++){
-			score = score + dices[i].getDiceValue();
-		}
-		return score;
-	}
-
-	public int[] getHandArray(){
-		int[] hand = new int[dices.length];
+	
+	//Ger lista med tärningarnas värde
+	public int[] getHandArray(Hand hand){
+		int[] handArray = new int[dices.length];
 
 		for(int i = 0; i < dices.length; i ++){
-			hand[i] = dices[i].getDiceValue();
+			handArray[i] = dices[i].getDiceValue();
 		}
-		Arrays.sort(hand);
-		return hand;
+		Arrays.sort(handArray);
+		return handArray;
 	}
-
+	
+	//Addera 1 till motsvarande plats i freqlistan
 	public int[] diceFrequency(int[] dices, int[] frequencyArray){
-		//Add 1 to the corresponding place in the frequency array
+		frequencyArray = new int[6];
 		for(int i : dices) {
 			frequencyArray[i-1]++;
 		}
 		return frequencyArray;
 	}
 	
-	//For testing
+	//Test
 	public void setDices(int[] values){
 		for(int i = 0; i < 5; i++){
 			dices[i].faceValue = values[i];

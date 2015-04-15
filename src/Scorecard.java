@@ -28,56 +28,57 @@ public class Scorecard {
 		}
 	}
 
-	public boolean isScorecardFilled(){
-		return getEmptyCategories().isEmpty();
+	public boolean isScorecardFilled(Scorecard card){
+		return card.getEmptyCategories(card).isEmpty();
 	}
-
-	public LinkedList<Integer> getEmptyCategories(){
+	
+	//Returnerar alla tomma positioner
+	public LinkedList<Integer> getEmptyCategories(Scorecard card){
 		LinkedList<Integer> emptyCategories = new LinkedList<Integer>();
 		for(int i = 0; i < categories.length; i++){
-			if(categories[i] == -1){
+			if(card.categories[i] == -1){
 				emptyCategories.add(i);
 			}
 		}
 		return emptyCategories;
 	}	
 
-	public int onPar(){
+	public int onPar(Scorecard card){
 		int parScore = 0;
 
 		for(int i = 0; i <= sixes; i++){
-			if(categories[i] >= 0){
-				parScore += categories[i];
+			if(card.categories[i] >= 0){
+				parScore += card.categories[i];
 			} 
 			else{
 				parScore += (i+1) * 3;
 			}
 		}
 		
-		//Om över onPar, ret 1
+		//Om över onPar, returnera 1
 		if(parScore > pointsToBonus){
 			return 1;
 		}
-		//Om onPar, ret 0
+		//Om onPar, returnera 0
 		if(parScore == pointsToBonus){
 			return 0;
 		}
-		//Om under onPar, ret -1
+		//Om under onPar, returnera -1
 		return -1;
 	}
 	
-	//Kollar om man fortfarande ligger onPar om man lägger i värdet i scorecarden
+	//Kollar om man fortfarande ligger onPar om man lägger en dålig hand i tophalf
 	public boolean stillOnPar(Scorecard card, Hand hand){
-		LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		int filledTotal = 0;
 		int prelTotal = 0;
 		boolean[] freeOneToSixes = new boolean[6];
 		int[] diceFreq = new int [AI.diceMaxValue];
-		diceFreq = hand.diceFrequency(hand.getHandArray(), diceFreq);
+		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		
 		//Kollar vad vi har fyllt hittills
-		for(int i = 0; i < diceFreq.length; i++){
-			if(categories[i] >= 0){
+		for(int i = 0; i <= sixes; i++){
+			if(card.categories[i] >= 0){
 				filledTotal += categories[i];
 			}
 			//Om kategorin är tom, spara undan detta
@@ -87,36 +88,39 @@ public class Scorecard {
 		}
 		
 		//Undersöker om vi kan placera en valör utan att riskera bonusen
-		for(int i = 0; i < diceFreq.length; i++){
+		for(int j = 0; j < diceFreq.length; j++){
 			//Hittar ett värde att testa på
-			if(diceFreq[i] > 0 && emptyCategories.contains(i)){
-				freeOneToSixes[i] = false;
-				prelTotal = filledTotal + (diceFreq[i]*(i+1));
-				
+			if(freeOneToSixes[j] && diceFreq[j] > 0 && emptyCategories.contains(j)){
+				freeOneToSixes[j] = false;
+				prelTotal = filledTotal + (diceFreq[j]*(j+1));
+
 				//Alla fria kategorier (förutom den valda ovan) *3 läggs till prelTotal
-				for(int j = 0; j < freeOneToSixes.length; j++){
-					if(freeOneToSixes[j] == true){
-						prelTotal += (j+1) * 3;
+				for(int k = 0; k < freeOneToSixes.length; k++){
+					if(freeOneToSixes[k] == true){
+						prelTotal += (k+1) * 3;
 					}
 				}
 				
 				//Om prelTotal fortfarande ger oss bonusen så returnerar vi den valören som vi kan fylla
-				if(prelTotal >= 63){
-					card.categories[i] = diceFreq[i]*(i+1);
+				if(prelTotal >= pointsToBonus){
+					card.categories[j] = diceFreq[j]*(j+1);
 					return true;
 				}
+				//Då vi inte får bonusen, återställ och kolla genom andra valörer
+				freeOneToSixes[j] = true;
+				prelTotal = 0;
 			}
 		}
 		//Om alla val resulterar i att vi ligger under onPar
 		return false;
 	}
 	
-	public boolean possibleToGetBonus(){
+	public boolean possibleToGetBonus(Scorecard card){
 		int score = 0;
 
 		for(int i = 0; i <= sixes; i++){
-			if(categories[i] >= 0){
-				score += categories[i];
+			if(card.categories[i] >= 0){
+				score += card.categories[i];
 			} 
 			else{
 				score += i * 5;
@@ -129,12 +133,12 @@ public class Scorecard {
 		return false;
 	}
 
-	public boolean doWeHaveBonus(){
+	public boolean doWeHaveBonus(Scorecard card){
 		int score = 0;
 
 		for(int i = 0; i <= sixes; i++){
-			if(categories[i] >= 0){
-				score += categories[i];
+			if(card.categories[i] >= 0){
+				score += card.categories[i];
 			}
 		}
 
@@ -144,18 +148,18 @@ public class Scorecard {
 		return false;
 	}
 
-	public int finalScore(){
+	public int finalScore(Scorecard card){
 		int total = 0;
 		for(int i = 0; i < categories.length; i++){
-			total += categories[i];
+			total += card.categories[i];
 		}
-		if(doWeHaveBonus()){
+		if(doWeHaveBonus(card)){
 			total += bonus;
 		}
 		return total;
 	}
 	
-	//For testing
+	//Test
 	public void setScores(int[] array){
 		categories = array;
 	}
