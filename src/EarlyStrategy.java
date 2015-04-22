@@ -9,13 +9,11 @@ public class EarlyStrategy {
 		System.out.println("hand1: "+hand);
 		//Kolla om vi har stege eller yatzy
 		if(AI.catchHand(card, hand)){
-			System.out.println("vi fick y eller s");
 			return;
 		}
 
 		//Om vi har början på en stege, slå efter stege ej värt att slå om för x-of-a-kind
 		if(checkBrokenStraight(hand) && (emptyCategories.contains(Scorecard.smallStraight) || emptyCategories.contains(Scorecard.largeStraight))){
-			System.out.println("vi slår efter stege");
 			goForStraight(card, hand, emptyCategories);
 			return;
 		}
@@ -39,6 +37,10 @@ public class EarlyStrategy {
 		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		valueToKeep = valueToKeep(card, hand, diceFreq);
 		System.out.println("vi sparar: "+valueToKeep);
+		
+		if(AI.catchHand(card, hand)){
+			return;
+		}
 		
 		//Då vi inte hittade ett vettigt värde (freq < 3)
 		if(valueToKeep == -1){

@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,7 +47,12 @@ public class Printer {
 			writeInt(results.get(i));
 		}
 		
-		System.out.println("Medelvärde: "  + sum/nrGames);
+		double sumOfAllGames = sum;
+		double nrOfGames = nrGames;
+		
+		double meanValue = sumOfAllGames/nrOfGames;
+		
+		System.out.println("Medelvärde: "  + meanValue);
 		System.out.println("Bästa: " + best);
 		System.out.println("Värsta: " + worst );
 		
