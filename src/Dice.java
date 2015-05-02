@@ -16,7 +16,8 @@ public class Dice {
 	public int getDiceValue(){
 		return faceValue;
 	}
-
+	
+	//toString
 	public String toString(){
 		return Integer.toString(faceValue);
 	}

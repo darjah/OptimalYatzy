@@ -44,6 +44,21 @@ public class Hand {
 		return frequencyArray;
 	}
 	
+	//Retrunerar högsta freq
+	public int getHighestFreq(){
+		int[] diceFreq = new int[AI.diceMaxValue];
+		diceFreq = diceFrequency(getHandArray(this), diceFreq);
+		
+		int highestFreq = 0;
+		for(int i = 0; i < diceFreq.length; i++){
+			if(diceFreq[i] >= highestFreq){
+				highestFreq = diceFreq[i];
+			}
+		}
+		
+		return highestFreq;
+	}
+	
 	//Test
 	public void setDices(int[] values){
 		for(int i = 0; i < 5; i++){
@@ -51,6 +66,7 @@ public class Hand {
 		}
 	}
 	
+	//toString
 	public String toString(){
 		return(new StringBuilder(dices[0] + " " + dices[1] + " " + dices[2] + " " + dices[3]) + " " + dices[4]);
 	}

@@ -2,8 +2,11 @@ import java.util.LinkedList;
 
 public class MidStrategy {
 	public static void play(Scorecard card, Hand hand){
-		//Fånga liten/stor stege eller yatzy direkt
+		//Fånga Y/S/Kåk
 		if(AI.catchHand(card, hand)){
+			return;
+		}
+		if(AI.fullHouse(card, hand)){
 			return;
 		}
 
@@ -22,19 +25,17 @@ public class MidStrategy {
 
 	public static void underPar(Scorecard card, Hand hand){
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
-
-		//Fånga liten/stor stege eller yatzy direkt
-		if(AI.catchHand(card, hand)){
+		int[] evalScores = new int[card.categories.length];
+		AI.evalScores(hand, evalScores);
+		
+		//Om vi har två par och är den är ledig eller kåk är ledig, försök få en kåk
+		if(evalScores[Scorecard.twoPair] != 0 && ((emptyCategories.contains(Scorecard.twoPair) || emptyCategories.contains(Scorecard.fullHouse)))){
+			twoPairMid(card, hand);
 			return;
 		}
 		
-		//Fånga kåk
-		if(AI.fullHouse(card, hand)){
-			return;
-		}
-
 		//Om vi har en traig stege, gå för den
-		if(EarlyStrategy.checkBrokenStraight(hand)){
+		if(EarlyStrategy.checkBrokenStraight(hand) && (emptyCategories.contains(Scorecard.smallStraight) || emptyCategories.contains(Scorecard.largeStraight))){
 			EarlyStrategy.goForStraight(card, hand, emptyCategories);
 			return;
 		}
@@ -43,16 +44,7 @@ public class MidStrategy {
 		int valueToKeep = valueToKeep(card, hand);
 		GetCategories.allOfAKind(hand, valueToKeep);
 
-		//Fånga liten/stor stege eller yatzy direkt
-		if(AI.catchHand(card, hand)){
-			return;
-		}
-		//Fånga kåk
-		if(AI.fullHouse(card, hand)){
-			return;
-		}
-
-		//Kasta om och kolla vad som ska göras med handen
+		//Kasta om en sista gång och kolla vad som ska göras med handen
 		valueToKeep = valueToKeep(card, hand);
 		GetCategories.allOfAKind(hand, valueToKeep);
 		endMove(card, hand);
@@ -64,89 +56,47 @@ public class MidStrategy {
 		int[] evalScores = new int[card.categories.length];
 		AI.evalScores(hand, evalScores);
 
-		//Fånga kåk direkt
-		if(AI.fullHouse(card, hand)){
-			return;
-		}
-
 		//Om vi har två par och är den är ledig eller kåk är ledig, försök få en kåk
 		if(evalScores[Scorecard.twoPair] != 0 && ((emptyCategories.contains(Scorecard.twoPair) || emptyCategories.contains(Scorecard.fullHouse)))){
-			twoPairMid(card, hand, emptyCategories, evalScores);
+			twoPairMid(card, hand);
 			return;
 		}
 
-		//Om vi har början på en stege (saknar endast en tärning)
-		if((emptyCategories.contains(Scorecard.largeStraight) || emptyCategories.contains(Scorecard.smallStraight)) && EarlyStrategy.checkBrokenStraight(hand)){
+		//Om vi har en traig stege, gå för den
+		if(EarlyStrategy.checkBrokenStraight(hand) && (emptyCategories.contains(Scorecard.smallStraight) || emptyCategories.contains(Scorecard.largeStraight))){
 			EarlyStrategy.goForStraight(card, hand, emptyCategories);
 			return;
 		}
-
+		
+		//Då vi kan riskera att vara lite slöaktig med höga fekvenser och satsa på högre summor isället
 		int keep = betOnInt(card, hand);
 		GetCategories.allOfAKind(hand, keep);
 		
-		//Fånga yatzy/stegar
+		//Fånga Y/S/Kåk
 		if(AI.catchHand(card, hand)){
 			return;
 		}
-		
-		//Fånga kåk
 		if(AI.fullHouse(card, hand)){
 			return;
 		}
 		
 		//Kasta om och kolla vad som ska göras med handen
+		keep = betOnInt(card, hand);
 		GetCategories.allOfAKind(hand, keep);
 		endMove(card, hand);
 	}
 
 	//Används då vi har två par i handen och vill satsa på en kåk
-	public static void twoPairMid(Scorecard card, Hand hand, LinkedList<Integer> emptyCategories, int[] evalScores){
+	public static void twoPairMid(Scorecard card, Hand hand){
 		GetCategories.twoPairToFullHouse(hand);
-		AI.evalScores(hand, evalScores);
-
-		//Fånga kåken
 		if(AI.fullHouse(card, hand)){
 			return;
 		}
-
 		GetCategories.twoPairToFullHouse(hand);
-		AI.evalScores(hand, evalScores);
-
-		//Kollar om vi kan göra nåt bra med handen 
-		if(EarlyStrategy.canWeDoAnythingGoodWithThisHand(card, hand, evalScores)){
-			return;
-		}
-
-		//Kollar om vi kan lägga det bästa värdet i övre halvan ändå
-		if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
-			int[] diceFreq = new int [AI.diceMaxValue];
-			diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
-			int highestValue = 0;
-			int diceValueTemp = 0;
-
-			for(diceValueTemp = AI.diceMaxValue; diceValueTemp > 0; diceValueTemp--){
-				if((diceFreq[diceValueTemp-1]*diceValueTemp > highestValue) && (emptyCategories.contains(diceValueTemp-1))){
-					highestValue = diceFreq[diceValueTemp-1]*diceValueTemp;
-				}
-			}
-
-			if(diceValueTemp != 0){
-				card.categories[diceValueTemp-1] = highestValue;
-				return;
-			}
-		}
-
-		//Kollar om vi kan placera handen i botten ändå
-		if(EarlyStrategy.canWeDoAnythingBadWithThisHand(card, hand, evalScores)){
-			return;
-		}
-
-		//I värsta fall, nolla
-		NullEntry.nullEntry(card);
-		return;
+		endMove(card, hand);
 	}
 
-	//Räknar ut vilket värde att satsa på och returnerar det
+	//Räknar ut vilket värde (högst frekvens) att satsa på och returnerar det
 	public static int valueToKeep(Scorecard card, Hand hand) {
 		int[] diceFreq = new int [AI.diceMaxValue];
 		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
@@ -163,14 +113,15 @@ public class MidStrategy {
 		}
 		return valueToKeep;
 	}
-
+	
+	//Räknar ut vilket värde (högsta summan) att satsa på och returnerar det
 	public static int betOnInt(Scorecard card, Hand hand){
-		//LinkedList<Integer> emptyCategories = card.getEmptyCategories();
+		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		int[] diceFreq = new int [AI.diceMaxValue];
 		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 		int value = 1;
 
-		// omedlbart satsa pa mer en fyra av en sort
+		//Satsar omedelbart på mer en fyra av en sort
 		for(int l : diceFreq){
 			if(l >= 4){
 				return value;
@@ -188,10 +139,10 @@ public class MidStrategy {
 			}
 		}
 
-		/*boolean freeUpThere = emptyCategories.contains(highestDice - 1);
+		boolean freeUpThere = emptyCategories.contains(highestDice - 1);
 		if(freeUpThere){
 			return highestDice;
-		}*/
+		}
 
 		int highestCopy = highestDice;
 		highestSum = 0;
@@ -202,10 +153,10 @@ public class MidStrategy {
 			}
 		}
 
-		/*freeUpThere = emptyCategories.contains(highestDice - 1);
+		freeUpThere = emptyCategories.contains(highestDice - 1);
 		if(freeUpThere){
 			return highestDice;
-		}*/
+		}
 		return highestCopy;
 	}
 
@@ -214,12 +165,12 @@ public class MidStrategy {
 		int[] evalScores = new int[card.categories.length];
 		AI.evalScores(hand, evalScores);
 		
-		//Kollar om vi kan göra nåt bra med handen 
-		if(EarlyStrategy.canWeDoAnythingGoodWithThisHand(card, hand, evalScores)){
+		//Kollar om vi kan placera handen i botten
+		if(EarlyStrategy.canWeDoAnythingBadWithThisHand(card, hand, evalScores)){
 			return;
 		}
 
-		//Kollar om vi kan lägga det bästa värdet i övre halvan ändå
+		//Kollar om vi kan lägga det bästa värdet i övre halvan
 		if(emptyCategories.contains(0) || emptyCategories.contains(1) || emptyCategories.contains(2) || emptyCategories.contains(3) || emptyCategories.contains(5) || emptyCategories.contains(5)){
 			int[] diceFreq = new int [AI.diceMaxValue];
 			diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
@@ -236,11 +187,6 @@ public class MidStrategy {
 				card.categories[diceValueTemp-1] = highestValue;
 				return;
 			}
-		}
-
-		//Kollar om vi kan placera handen i botten ändå
-		if(EarlyStrategy.canWeDoAnythingBadWithThisHand(card, hand, evalScores)){
-			return;
 		}
 
 		//I värsta fall, nolla

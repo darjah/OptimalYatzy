@@ -14,9 +14,8 @@ public class test {
 		System.out.println(EarlyStrategy.checkBrokenStraight(hand));
 
 		EarlyStrategy.goForStraight(card, hand, emptyCategories);
-	}*/
+	}
 
-	@Test
 	public void test2(){
 		Scorecard card = new Scorecard();
 		int[] scores = {-1,-1,9,16,-1,18,-1,-1,-1,-1,-1,-1,-1,-1,-1};
@@ -35,11 +34,10 @@ public class test {
 		System.out.println(card.stillOnPar(card, hand));
 		/*for(int i = 0; i< 15; i++){
 			System.out.println(card.categories[i]);
-		}*/
+		}
 	}
 
-	//@Test
-	/*public void test3(){
+	public void test3(){
 		Scorecard card = new Scorecard();
 		Hand hand = new Hand();
 		int[] dice = {3,3,4,4,5};
@@ -49,5 +47,20 @@ public class test {
 			System.out.println("funkar");
 		}
 	}*/
-
+	
+	@Test
+	public void test4(){
+		Scorecard card = new Scorecard();
+		int[] scores = {-1,-1,9,16,-1,18,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+		card.setScores(scores);
+		
+		Hand hand = new Hand();
+		int[] dice = {2,2,3,4,5};
+		hand.setDices(dice);
+		
+		EarlyStrategy.play(card, hand);
+		for(int i = 0; i< 15; i++){
+			System.out.println(card.categories[i]);
+		}
+	}
 }

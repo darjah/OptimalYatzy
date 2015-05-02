@@ -2,18 +2,16 @@ import java.util.LinkedList;
 
 public class AI {
 	final static public int diceMaxValue = 6;
-	final static public int earlyGame = 6;
-	final static public int midGame = 11;
+	final static public int midGame = 13;
 
 	public static void play(Scorecard card, Hand hand) {
 		LinkedList<Integer> emptyCategories = card.getEmptyCategories(card);
 		int turn = 15 - emptyCategories.size() + 1;
 
-		if(card.possibleToGetBonus(card)){
+		if(card.possibleToGetBonus(card) && !card.doWeHaveBonus(card)){
 			EarlyStrategy.play(card, hand);
 			return;
 		}
-
 		else if(turn <= midGame){
 			MidStrategy.play(card, hand);
 			return;
@@ -44,29 +42,21 @@ public class AI {
 	}
 
 	public static int pairScore(Hand hand){
-		int highestScore = 0;
-		int[] scores = new int[diceMaxValue];
+		int score = 0;
 		int[] diceFreq = new int [diceMaxValue];
 		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
-		//Hitta paren genom att kolla frekvenslistan, par om diceFreq[i]>=2
+		//Hitta paret genom att kolla frekvenslistan, par om diceFreq[i]>=2
 		for(int i = 0; i < diceMaxValue; i++){
 			if(diceFreq[i] >= 2){
-				scores[i] = (i+1)*2;
+				score = (i+1)*2;
 			}
 		}
-
-		//Plocka ut största paret
-		for(int j = 0; j < diceMaxValue; j++){
-			if(scores[j] >= highestScore){
-				highestScore = scores[j];
-			}
-		}
-		return highestScore;
+		return score;
 	}
 
 	public static int twoPairScore(Hand hand){
-		int highestScore = 0;
+		int score = 0;
 		int[] diceFreq = new int [diceMaxValue];
 		diceFreq = hand.diceFrequency(hand.getHandArray(hand), diceFreq);
 
@@ -79,11 +69,10 @@ public class AI {
 				firstPairEyes = i;	//Valör på första paret	
 			}
 			else if(diceFreq[i-1] >= 2 && firstPair){
-				highestScore = firstPairEyes*2 + i*2; //Andra paret hittat
+				score = firstPairEyes*2 + i*2; //Andra paret hittat
 			}
 		}
-
-		return highestScore;
+		return score;
 	}
 
 	public static int threeOfAKindScore(Hand hand){
@@ -128,7 +117,6 @@ public class AI {
 		if(smallStraightTrue){
 			score = 15;
 		}
-
 		return score;
 	}
 
@@ -144,9 +132,8 @@ public class AI {
 		}
 
 		if(largeStraightTrue){
-			score = 15;
+			score = 20;
 		}
-
 		return score;
 	}
 
@@ -170,7 +157,6 @@ public class AI {
 		if(pairEyes != 0 && trippleEyes != 0){
 			score = pairEyes * 2 + trippleEyes * 3;
 		}
-
 		return score;
 	}
 
@@ -191,7 +177,6 @@ public class AI {
 				return 50;
 			}
 		}
-
 		return 0;
 	}
 
@@ -207,17 +192,14 @@ public class AI {
 			card.categories[Scorecard.yatzy] = yatzyScore;
 			return true;
 		}
-
 		if((largeStraightScore != 0) && (freeScores.contains(Scorecard.largeStraight))){
 			card.categories[Scorecard.largeStraight] = largeStraightScore;
 			return true;
 		}
-
 		if((smallStraightScore != 0) && (freeScores.contains(Scorecard.smallStraight))){
 			card.categories[Scorecard.smallStraight] = smallStraightScore;
 			return true;
 		}
-
 		return false;
 	}
 
@@ -229,16 +211,5 @@ public class AI {
 			return true;
 		}
 		return false;
-	}
-
-	//Beräkna poäng för one-of-a-kind. Summerar poängen för de tärningar som har det givna värdet number, BORDE FLYTTAS TILL HAND? Finns i early och mid, avveckla
-	public static int numberScore(int[] dices, int number) {
-		int score = 0;
-		for (int i : dices) {
-			if (i == number) {
-				score += i;
-			}
-		}
-		return score;
 	}
 }

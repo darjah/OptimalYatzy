@@ -83,7 +83,9 @@ public class Scorecard {
 			}
 			//Om kategorin är tom, spara undan detta
 			else{
-				freeOneToSixes[i] = true;
+				//if(card.categories[i]<4){
+					freeOneToSixes[i] = true;
+				//}
 			}
 		}
 		
@@ -162,5 +164,13 @@ public class Scorecard {
 	//Test
 	public void setScores(int[] array){
 		categories = array;
+	}
+	
+	//toString
+	public String toString(){
+		for(int i = 0; i < 15; i++){
+			System.out.println(categories[i]);
+		}
+		return null;
 	}
 }
